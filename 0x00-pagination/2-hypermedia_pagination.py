@@ -33,6 +33,7 @@ class Server:
         return self.__dataset
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
+        '''returns paginated dataset'''
         assert isinstance(page, int) and page > 0\
                 and isinstance(page_size, int) and page_size > 0
         start, end = index_range(page, page_size)
@@ -42,7 +43,7 @@ class Server:
             # out of range pagination
             return []
 
-        return [dataset[i] for i in range(start, end)]
+        return dataset[start:end]
 
     def get_hyper(self, page: int = 1, page_size: int = 10) -> Dict:
         '''hypermeid as the engine of application state.
