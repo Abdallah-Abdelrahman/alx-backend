@@ -44,21 +44,22 @@ class Server:
                 and 0 <= index < len(self.indexed_dataset())\
                 and isinstance(page_size, int)
 
+        count = 0
         start = index
+        data = []
+        indexed_data = self.indexed_dataset()
 
-        while start < len(self.indexed_dataset())\
-                and not self.indexed_dataset().get(start):
+        while start < len(indexed_data) and count < page_size:
+            # loop in the range of index and page size
+            item = indexed_data.get(start)
+            if item:
+                data.append(item)
+                count += 1
             start += 1
-
-        next_ = start + page_size
-
-        if next_ >= len(self.indexed_dataset()):
-            next_ = None
 
         return {
                 'index': index,
-                'data': [self.indexed_dataset().get(i)
-                         for i in range(start, page_size + start)],
+                'data': data,
                 'page_size': page_size,
-                'next_index': next_,
+                'next_index': (start, None)[start >= len(indexed_data)],
         }
