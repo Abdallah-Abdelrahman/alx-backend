@@ -42,4 +42,17 @@ class Server:
     def get_hyper_index(self,
                         index: Union[int, None] = None,
                         page_size: int = 10) -> Dict:
-        pass
+        assert isinstance(index, int) and 0 <= index < len(self.dataset())
+
+        start = index
+
+        if not self.indexed_dataset().get(index):
+            start = index + 1
+
+        return {
+                'index': index,
+                'data': [self.indexed_dataset().get(i)
+                         for i in range(start, page_size + start)],
+                'page_size': page_size,
+                'next_index': start + page_size,
+        }
