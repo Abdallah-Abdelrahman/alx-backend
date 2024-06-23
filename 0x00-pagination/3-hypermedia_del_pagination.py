@@ -44,13 +44,14 @@ class Server:
                 and 0 <= index < len(self.indexed_dataset())
 
         start = index
-        next_ = start + page_size
 
         if not self.indexed_dataset().get(index):
             if index < len(self.indexed_dataset()) - 1:
                 start = index + 1
             else:
                 start = index - 1
+
+        next_ = start + page_size
 
         if next_ >= len(self.indexed_dataset()):
             next_ = None
