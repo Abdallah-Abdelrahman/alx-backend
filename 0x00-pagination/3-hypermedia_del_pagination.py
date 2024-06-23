@@ -66,6 +66,7 @@ class Server:
 
         while start < len(indexed_data) and count < page_size:
             # loop in the range of index and page size
+            # skipping deleted items
             item = indexed_data.get(start)
             if item:
                 data.append(item)
