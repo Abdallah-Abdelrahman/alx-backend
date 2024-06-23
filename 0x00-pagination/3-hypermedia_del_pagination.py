@@ -40,12 +40,16 @@ class Server:
         return self.__indexed_dataset
 
     def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
-        assert isinstance(index, int) and 0 <= index < len(self.indexed_dataset())
+        assert isinstance(index, int)\
+                and 0 <= index < len(self.indexed_dataset())
 
         start = index
 
         if not self.indexed_dataset().get(index):
-            start = index + 1
+            if index < len(self.indexed_dataset()) - 1:
+                start = index + 1
+            else:
+                start = index - 1
 
         return {
                 'index': index,
