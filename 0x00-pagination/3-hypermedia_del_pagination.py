@@ -44,6 +44,7 @@ class Server:
                 and 0 <= index < len(self.indexed_dataset())
 
         start = index
+        next_ = start + page_size
 
         if not self.indexed_dataset().get(index):
             if index < len(self.indexed_dataset()) - 1:
@@ -51,10 +52,13 @@ class Server:
             else:
                 start = index - 1
 
+        if next_ >= len(self.indexed_dataset()):
+            next_ = None
+
         return {
                 'index': index,
                 'data': [self.indexed_dataset().get(i)
                          for i in range(start, page_size + start)],
                 'page_size': page_size,
-                'next_index': start + page_size,
+                'next_index': next_,
         }
