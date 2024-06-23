@@ -46,8 +46,9 @@ class Server:
 
         start = index
 
-        if not self.indexed_dataset().get(index):
-            start = index + 1
+        while start < len(self.indexed_dataset())\
+                and not self.indexed_dataset().get(start):
+            start += 1
 
         next_ = start + page_size
 
