@@ -42,7 +42,7 @@ class Server:
     def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
         assert isinstance(index, int)\
                 and 0 <= index < len(self.indexed_dataset())\
-                and isinstance(page_size, int)
+                and isinstance(page_size, int) and page_size > 0
 
         count = 0
         start = index
