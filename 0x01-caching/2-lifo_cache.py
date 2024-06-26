@@ -23,7 +23,7 @@ class LIFOCache(BaseCaching):
             if self.MAX_ITEMS == len(self.cache_data):
                 k = self.stack.pop()
                 del self.cache_data[k]
-                print('DISCARD: ', k)
+                print('DISCARD: '.format(k))
             self.stack.append(key)
             self.cache_data[key] = item
 
