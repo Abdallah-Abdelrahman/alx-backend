@@ -18,8 +18,10 @@ class FIFOCache(BaseCaching):
                 # key already exist
                 # don't change order
                 self.cache_data[key] = item
+                self.queue.remove(key)
+                self.queue.append(key)
                 return
-            if self.MAX_ITEMS == len(self.cache_data):
+            if len(self.cache_data) >= self.MAX_ITEMS:
                 k = self.queue.popleft()
                 del self.cache_data[k]
                 print('DISCARD: ', k)
