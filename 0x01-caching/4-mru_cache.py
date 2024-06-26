@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
-'''Module defines `LRUCache` class'''
+'''Module defines `MRUCache` class'''
 from typing import Any, Union
 from base_caching import BaseCaching
 from collections import OrderedDict
 
 
-class LRUCache(BaseCaching):
-    '''caching using Least Recent Used algorithm'''
+class MRUCache(BaseCaching):
+    '''caching using Most Recent Used algorithm'''
     def __init__(self):
-        '''Initialze the instance
+        '''Initialze the instance.
 
         Note:
             the `OrderedDict` DS behaves like LIFO and FIFO,
-            when removing we remove from left(LRU),
+            when removing we remove from end(MRU),
             when updating or accessing element,
-            it's shifted to the end (MRU)
+            it's shifted to the end as well.
         '''
         super().__init__()
         self.cache_data = OrderedDict()
@@ -29,7 +29,7 @@ class LRUCache(BaseCaching):
                 self.cache_data.move_to_end(key)
                 return
             if len(self.cache_data) >= self.MAX_ITEMS:
-                k, _ = self.cache_data.popitem(last=False)
+                k, _ = self.cache_data.popitem()
                 print('DISCARD: {}'.format(k))
             self.cache_data[key] = item
 
