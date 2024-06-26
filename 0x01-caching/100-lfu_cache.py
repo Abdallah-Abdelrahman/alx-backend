@@ -18,44 +18,36 @@ class LFUCache(BaseCaching):
         '''
         super().__init__()
         self.cache_data = OrderedDict()
-        self.occurence = {}
+        self.used_count = {}
 
     def put(self, key: str, item: Any) -> None:
         '''put a value in the cache'''
 
-        if key and item:
-            if not self.occurence.get(key):
-                self.occurence[key] = 0
-            self.occurence[key] += 1
+        if key is None or item is None:
+            return
 
-            if key in self.cache_data:
-                # key already exist
-                # rearrange order
-                self.cache_data[key] = item
-                self.cache_data.move_to_end(key)
-                return
-
-            if len(self.cache_data) >= self.MAX_ITEMS:
-                lfu = {}
-                for k, v in self.occurence.items():
-                    if v not in lfu:
-                        lfu[v] = []
-                    lfu[v].append(k)
-                print(lfu)
-                min_ = min(lfu.keys())
-                if len(lfu[min_]) == 1:
-                    # perform LFU replcement
-                    self.cache_data.pop([lfu[min_]])
-                    print('DISCARD: {}'.format(lfu[min_]))
-                else:
-                    # perform LRU replacement
-                    k, _ = self.cache_data.popitem(last=False)
-                    print('DISCARD: {}'.format(k))
+        # If the key already exists, update the item and occurrence
+        if key in self.cache_data:
             self.cache_data[key] = item
+            self.used_count[key] += 1
+            self.cache_data.move_to_end(key)
+            return
+
+        # If the cache is full, remove the least frequently used item
+        if len(self.cache_data) >= self.MAX_ITEMS:
+            lfu_key = min(self.used_count,
+                          key=lambda k: (self.used_count[k], k))
+            self.cache_data.pop(lfu_key)
+            self.used_count.pop(lfu_key)
+            print('DISCARD: {}'.format(lfu_key))
+
+        # Add the new item and set its occurrence count to 1
+        self.cache_data[key] = item
+        self.used_count[key] = 1
 
     def get(self, key: str) -> Union[None, Any]:
         '''retrieve value from cache'''
         if key in self.cache_data:
-            self.occurence[key] += 1
+            self.used_count[key] += 1
             self.cache_data.move_to_end(key)
         return self.cache_data.get(key)
