@@ -26,7 +26,7 @@ class LFUCache(BaseCaching):
         if key is None or item is None:
             return
 
-        # If the key already exists, update the item and occurrence
+        # If the key already exists, update the item and use count
         if key in self.cache_data:
             self.cache_data[key] = item
             self.used_count[key] += 1
@@ -41,7 +41,7 @@ class LFUCache(BaseCaching):
             self.used_count.pop(lfu_key)
             print('DISCARD: {}'.format(lfu_key))
 
-        # Add the new item and set its occurrence count to 1
+        # Add the new item and set its use count to 1
         self.cache_data[key] = item
         self.used_count[key] = 1
 
