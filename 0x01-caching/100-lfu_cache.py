@@ -12,9 +12,7 @@ class LFUCache(BaseCaching):
 
         Note:
             the `OrderedDict` DS behaves like LIFO and FIFO,
-            when removing we remove from left(LRU),
-            when updating or accessing element,
-            it's shifted to the end (MRU)
+            it's used to retain the order of insertion.
         '''
         super().__init__()
         self.cache_data = OrderedDict()
@@ -23,31 +21,31 @@ class LFUCache(BaseCaching):
     def put(self, key: str, item: Any) -> None:
         '''put a value in the cache'''
 
-        if key is None or item is None:
-            return
+        if key and item:
+            if key in self.cache_data:
+                # key already exist (cache hit)
+                # rearrange order
+                self.cache_data[key] = item
+                self.used_count[key] += 1
+                return
 
-        # If the key already exists, update the item and use count
-        if key in self.cache_data:
+            if len(self.cache_data) >= self.MAX_ITEMS:
+                # max hit
+                lfu = {}
+                for k, v in self.used_count.items():
+                    if v not in lfu:
+                        lfu[v] = []
+                    lfu[v].append(k)
+
+                k = lfu[min(lfu.keys())][0]  # LRU when there's a tie
+                self.cache_data.pop(k)
+                self.used_count.pop(k)
+                print('DISCARD: {}'.format(k))
             self.cache_data[key] = item
-            self.used_count[key] += 1
-            self.cache_data.move_to_end(key)
-            return
-
-        # If the cache is full, remove the least frequently used item
-        if len(self.cache_data) >= self.MAX_ITEMS:
-            lfu_key = min(self.used_count,
-                          key=lambda k: (self.used_count[k], k))
-            self.cache_data.pop(lfu_key)
-            self.used_count.pop(lfu_key)
-            print('DISCARD: {}'.format(lfu_key))
-
-        # Add the new item and set its use count to 1
-        self.cache_data[key] = item
-        self.used_count[key] = 1
+            self.used_count[key] = 1
 
     def get(self, key: str) -> Union[None, Any]:
         '''retrieve value from cache'''
         if key in self.cache_data:
             self.used_count[key] += 1
-            self.cache_data.move_to_end(key)
         return self.cache_data.get(key)
