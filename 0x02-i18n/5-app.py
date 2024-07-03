@@ -49,5 +49,11 @@ def before_request() -> None:
     '''find a user if any, and set it as a global on `flask.g.user`'''
     id_ = request.args.get('login_as')
 
-    id_ = int(id_)
-    g.user = get_user(id_)
+    if id_ and id_.isnumeric():
+        id_ = int(id_)
+    # set user on flask global
+    setattr(g, 'user', get_user(id_))
+
+
+if __name__ == '__main__':
+    app.run(host="127.0.0.1", port="5000")
