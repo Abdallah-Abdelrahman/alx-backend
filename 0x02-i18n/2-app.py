@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 '''Module defines flask app'''
-from flask import Flask, request
+from flask import Flask, request, render_template
 from flask_babel import Babel
 
 
@@ -20,3 +20,9 @@ babel = Babel(app)
 def get_locale():
     '''determine the best match with our supported languages'''
     return request.accept_languages.best_match(['de', 'fr', 'en'])
+
+
+@app.route('/')
+def index():
+    '''render index template'''
+    return render_template('2-index.html')
