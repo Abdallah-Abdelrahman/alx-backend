@@ -1,24 +1,10 @@
 #!/usr/bin/env python3
-""" Basic Flask app """
-from typing import Dict, Union
-
-from flask import Flask, g, render_template, request
+'''Module defines flask app'''
+from typing import Any, Dict, Union
+from flask import Flask, request, render_template, g
 from flask_babel import Babel
 
-
-class Config(object):
-    """Configuration class for Babel"""
-
-    LANGUAGES = ["en", "fr"]
-    BABEL_DEFAULT_LOCALE = "en"
-    BABEL_DEFAULT_TIMEZONE = "UTC"
-
-
-app = Flask(__name__)
-app.config.from_object(Config)
-babel = Babel(app)
-
-users: Dict[int, Dict[str, Union[str, None]]] = {
+users: Dict[int, Dict[str, Any]] = {
     1: {"name": "Balou", "locale": "fr", "timezone": "Europe/Paris"},
     2: {"name": "Beyonce", "locale": "en", "timezone": "US/Central"},
     3: {"name": "Spock", "locale": "kg", "timezone": "Vulcan"},
@@ -26,35 +12,46 @@ users: Dict[int, Dict[str, Union[str, None]]] = {
 }
 
 
-def get_user() -> Union[Dict[str, Union[str, None]], None]:
-    """Returns a user dictionary or None"""
-    user_id = request.args.get("login_as")
-    if user_id is not None:
-        user_id = int(user_id)
-        return users.get(user_id)
-    return None
+class Config:
+    '''Configuration class for Babel'''
+    LANGUAGES = ['en', 'fr']
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
+
+
+app = Flask(__name__)
+app.config.from_object(Config)
+babel = Babel(app)
+
+
+@babel.localeselector
+def get_locale():
+    '''determine the best match with our supported languages'''
+    lang = request.args.get('locale')
+    if lang in app.config.get('LANGUAGES'):
+        return lang
+    return request.accept_languages.best_match(app.config.get('LANGUAGES'))
+
+
+@app.route('/')
+def index():
+    '''render index template'''
+    return render_template('5-index.html', user=g.user)
+
+
+def get_user(id: int) -> Union[Dict[str, str], None]:
+    '''returns a user dictionary or None'''
+    return users.get(id)
 
 
 @app.before_request
 def before_request() -> None:
-    """Executes before all other functions"""
-    g.user = get_user()
+    '''find a user if any, and set it as a global on `flask.g.user`'''
+    id_ = request.args.get('login_as')
 
+    if not id_.isnumeric():
+        setattr(g, 'user', None)
+        return
 
-@babel.localeselector
-def get_locale() -> str:
-    """Determine the best match with our supported languages"""
-    locale = request.args.get("locale")
-    if locale and locale in app.config["LANGUAGES"]:
-        return locale
-    return request.accept_languages.best_match(app.config["LANGUAGES"])
-
-
-@app.route("/")
-def index() -> str:
-    """Route for index page"""
-    return render_template("5-index.html")
-
-
-if __name__ == "__main__":
-    app.run(host="127.0.0.1", port="5000")
+    # set user on flask global
+    setattr(g, 'user', get_user(int(id_)))
