@@ -41,7 +41,7 @@ def index():
 
 def get_user(id_: int) -> Union[Dict[str, str], None]:
     '''returns a user dictionary or None'''
-    return users.get(id_)
+    return users.get(id_) if id_ in users else None
 
 
 @app.before_request
