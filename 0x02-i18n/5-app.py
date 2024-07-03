@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-'''Module defines flask app'''
-from typing import Any, Dict, Union
-from flask import Flask, request, render_template, g
+""" Basic Flask app """
+from typing import Dict, Union
+
+from flask import Flask, g, render_template, request
 from flask_babel import Babel
 
 
@@ -57,6 +58,3 @@ def index() -> str:
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port="5000")
-    if lang in app.config.get('LANGUAGES'):
-        return lang
-    return request.accept_languages.best_match(app.config.get('LANGUAGES'))
