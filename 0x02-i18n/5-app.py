@@ -24,6 +24,21 @@ app.config.from_object(Config)
 babel = Babel(app)
 
 
+def get_user() -> Union[Dict[str, Union[str, None]], None]:
+    '''returns a user dictionary or None'''
+    id_ = request.args.get("login_as")
+    if id_ is not None:
+        id_ = int(id_)
+        return users.get(id_)
+    return None
+
+
+@app.before_request
+def before_request() -> None:
+    '''find a user if any, and set it as a global on `flask.g.user`'''
+    setattr(g, 'user', get_user())
+
+
 @babel.localeselector
 def get_locale():
     '''determine the best match with our supported languages'''
@@ -37,21 +52,6 @@ def get_locale():
 def index():
     '''render index template'''
     return render_template('5-index.html', user=g.user)
-
-
-def get_user() -> Union[Dict[str, str], None]:
-    '''returns a user dictionary or None'''
-    id_ = request.args.get("login_as")
-    if id_ is not None:
-        id_ = int(id_)
-        return users.get(id_)
-    return None
-
-
-@app.before_request
-def before_request() -> None:
-    '''find a user if any, and set it as a global on `flask.g.user`'''
-    setattr(g, 'user', get_user())
 
 
 if __name__ == '__main__':
