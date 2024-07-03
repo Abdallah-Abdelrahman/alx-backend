@@ -28,33 +28,35 @@ babel = Babel(app)
 def get_locale():
     '''determine the best match with our supported languages'''
     lang = request.args.get('locale')
+    user = get_user()
+
     if lang in app.config.get('LANGUAGES'):
         return lang
+    if user:
+        return user.get('locale')
     return request.accept_languages.best_match(app.config.get('LANGUAGES'))
 
 
 @app.route('/')
 def index():
     '''render index template'''
-    return render_template('5-index.html', user=g.user)
+    return render_template('6-index.html', user=g.user)
 
 
-def get_user(id: int) -> Union[Dict[str, str], None]:
+def get_user() -> Union[Dict[str, str], None]:
     '''returns a user dictionary or None'''
-    return users.get(id)
+    id_ = request.args.get('login_as')
+
+    if not id_ or not id_.isnumeric():
+        return None
+    return users.get(int(id_))
 
 
 @app.before_request
-def before_request():
+def before_request() -> None:
     '''find a user if any, and set it as a global on `flask.g.user`'''
-    id_ = request.args.get('login_as')
+    setattr(g, 'user', get_user())
 
-    if not id_.isnumeric():
-        return
 
-    id_ = int(id_)
-    user = get_user(id_)
-
-    # set user on flask global
-    if user:
-        setattr(g, 'user', user)
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port='5000')
