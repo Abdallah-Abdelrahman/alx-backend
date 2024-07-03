@@ -43,7 +43,7 @@ def get_user() -> Union[Dict[str, str], None]:
     '''returns a user dictionary or None'''
     id_ = request.args.get('login_as')
 
-    if not id_.isnumeric():
+    if not id_ or not id_.isnumeric():
         return None
     return users.get(int(id_))
 
@@ -55,4 +55,4 @@ def before_request() -> None:
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='127.0.0.1', port='5000')
