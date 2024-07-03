@@ -45,7 +45,7 @@ def get_user(id: int) -> Union[Dict[str, str], None]:
 
 
 @app.before_request
-def before_request() -> None:
+def before_request():
     '''find a user if any, and set it as a global on `flask.g.user`'''
     id_ = request.args.get('login_as')
 
@@ -53,4 +53,8 @@ def before_request() -> None:
         return
 
     id_ = int(id_)
-    g.user = get_user(id_)
+    user = get_user(id_)
+
+    # set user on flask global
+    if user:
+        setattr(g, 'user', user)
