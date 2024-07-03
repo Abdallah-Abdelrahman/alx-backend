@@ -41,7 +41,7 @@ def index():
 
 def get_user(id_: int) -> Union[Dict[str, str], None]:
     '''returns a user dictionary or None'''
-    return users.get(id_) if id_ in users else None
+    return users.get(id_)
 
 
 @app.before_request
@@ -52,7 +52,7 @@ def before_request() -> None:
     if id_ and id_.isnumeric():
         id_ = int(id_)
     # set user on flask global
-    setattr(g, 'user', get_user(id_))
+    g.user = get_user(id_)
 
 
 if __name__ == '__main__':
