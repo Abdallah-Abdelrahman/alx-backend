@@ -28,7 +28,7 @@ msgstr "Hello world!"
 
 #: templates/5-index.html:10
 msgid "logged_in_as"
-msgstr "Welcome to Holberton %(username)s."
+msgstr "You are logged in as %(username)s."
 
 #: templates/5-index.html:12
 msgid "not_logged_in"

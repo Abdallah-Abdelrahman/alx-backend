@@ -39,19 +39,20 @@ def index():
     return render_template('5-index.html', user=g.user)
 
 
-def get_user(id: int) -> Union[Dict[str, str], None]:
+def get_user() -> Union[Dict[str, str], None]:
     '''returns a user dictionary or None'''
-    return users.get(id)
+    id_ = request.args.get('login_as')
+
+    if not id_.isnumeric():
+        return None
+    return users.get(int(id_))
 
 
 @app.before_request
 def before_request() -> None:
     '''find a user if any, and set it as a global on `flask.g.user`'''
-    id_ = request.args.get('login_as')
+    setattr(g, 'user', get_user())
 
-    if not id_.isnumeric():
-        setattr(g, 'user', None)
-        return
 
-    # set user on flask global
-    setattr(g, 'user', get_user(int(id_)))
+if __name__ == '__main__':
+    app.run(debug=True)
